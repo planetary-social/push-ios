@@ -9,11 +9,11 @@ import Foundation
 
 public class Push {
 
-    public static let shared = Push()
+    public static let shared = Push(service: PushServiceAdapter(apiService: PlanetaryService()))
 
     var service: PushService
 
-    init(service: PushService = PlanetaryService()) {
+    init(service: PushService) {
         self.service = service
     }
 

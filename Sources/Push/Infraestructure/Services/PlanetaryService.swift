@@ -9,7 +9,7 @@ import Foundation
 import Secrets
 import Logger
 
-class PlanetaryService: PushService {
+class PlanetaryService: APIService {
 
     private var scheme: String
     private var host: String
@@ -17,24 +17,27 @@ class PlanetaryService: PushService {
     private var path: String
     private var token: String?
     private var environment: String
+    private var session: URLSession
 
-    init() {
+    init(secrets: Secrets = Secrets.shared, session: URLSession = URLSession.shared) {
         self.scheme = "https"
         self.host = "us-central1-pub-verse-app.cloudfunctions.net"
         self.port = 443
         self.path = "/apns-service/apns"
-        self.token = Secrets.shared.get(key: .push)
+        self.token = secrets.get(key: .push)
         #if DEBUG
         self.environment = "development"
         #else
         self.environment = "production"
         #endif
+        self.session = session
     }
 
     func update(_ token: Data?, for identity: Identity, completion: @escaping ((PushError?) -> Void)) {
         var json: [String: Any] = ["identity": identity.identifier]
         if let token = token {
-            json["token"] = token.hexEncodedString()
+            let encoder = HexEncoder()
+            json["token"] = encoder.encode(data: token)
         }
         json["environment"] = environment
 
@@ -55,8 +58,6 @@ extension PlanetaryService {
             completion(.encodeError)
             return
         }
-        let headers = ["Content-Type": "application/json",
-                       "planetary-push-authorize": token]
 
         var components = URLComponents()
         components.scheme = self.scheme
@@ -75,24 +76,13 @@ extension PlanetaryService {
         request.httpMethod = "POST"
         request.httpBody = body
 
-        URLSession.shared.dataTask(with: request) { data, response, error in
+        session.dataTask(with: request) { data, response, error in
             let pushError = response?.httpStatusCodeError ?? .optional(error)
             Logger.shared.optional(pushError, from: response)
             DispatchQueue.main.async {
                 completion(pushError)
             }
         }.resume()
-    }
-
-}
-
-fileprivate extension Data {
-
-    // Borrowed from Stack Overflow
-    // https://stackoverflow.com/questions/8798725/get-device-token-for-push-notification
-    func hexEncodedString() -> String {
-        let string = self.reduce("", {$0 + String(format: "%02X", $1)})
-        return string
     }
 
 }

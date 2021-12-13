@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/planetary-social/logger-ios",
         "state": {
           "branch": null,
-          "revision": "8c0fb24bbdbfee8212941abef1947eefbfa89042",
-          "version": "0.1.1"
+          "revision": "d702ccd6e95c1e3154b3206157b1cbf8ea1c7a3e",
+          "version": "0.0.2"
         }
       },
       {
@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/planetary-social/secrets-ios",
         "state": {
           "branch": null,
-          "revision": "43641227362a0bafc1fdb4245abe94817a4954c2",
-          "version": "0.0.1"
+          "revision": "0952c06da65df7691fa7a5600a0ff3dd602088f2",
+          "version": "0.0.3"
         }
       },
       {
